@@ -555,8 +555,44 @@ Rectangle {
                         }
                     }
                 }
+            }
+
+            // Clock (Bottom Right)
+            Row {
+                anchors.right: parent.right; anchors.rightMargin: 24 * s
+                anchors.bottom: parent.bottom; anchors.bottomMargin: 14 * s
+                spacing: 12 * s
+
+                Text {
+                    id: srDate
+                    font.family: mainFont.name; font.pixelSize: 11 * s
+                    color: "white"; opacity: 0.4; font.letterSpacing: 1.5 * s
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                Rectangle {
+                    width: 2 * s; height: 10 * s; color: root.srGoldLight; opacity: 0.5
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+                
+                Text {
+                    id: srTime
+                    font.family: mainFont.name; font.pixelSize: 15 * s; font.bold: true
+                    color: root.srGoldLight; opacity: 0.9; font.letterSpacing: 1.5 * s
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                Timer {
+                    interval: 1000; running: true; repeat: true
+                    onTriggered: {
+                        var d = new Date();
+                        srTime.text = Qt.formatTime(d, "HH:mm");
+                        srDate.text = Qt.formatDate(d, "yyyy / MM / dd");
+                    }
+                    Component.onCompleted: triggered()
+                }
+            }
         }
-    }
 
 
     // Session Popup

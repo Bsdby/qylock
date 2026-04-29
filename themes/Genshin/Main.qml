@@ -166,6 +166,56 @@ Rectangle {
             }
         }
 
+        // Top Right: Clock
+        Column {
+            anchors.right: parent.right; anchors.rightMargin: 40 * s
+            anchors.top: parent.top; anchors.topMargin: 30 * s
+            spacing: 0
+
+            Text {
+                id: genshinTime
+                anchors.right: parent.right
+                font.family: mainFont.name
+                font.pixelSize: 52 * s
+                font.letterSpacing: 2 * s
+                color: root.gTextMain
+                layer.enabled: true
+                layer.effect: DropShadow { radius: 6; color: "#88000000"; samples: 12; x: 1; y: 2 }
+            }
+            Row {
+                anchors.right: parent.right
+                spacing: 12 * s
+                Text {
+                    id: genshinDate
+                    font.family: mainFont.name
+                    font.pixelSize: 14 * s
+                    font.letterSpacing: 2 * s
+                    color: root.gTextDim
+                    anchors.verticalCenter: parent.verticalCenter
+                    layer.enabled: true
+                    layer.effect: DropShadow { radius: 4; color: "#88000000"; samples: 8; x: 1; y: 1 }
+                }
+                Rectangle {
+                    width: 12 * s; height: 12 * s; rotation: 45
+                    color: root.gGold; anchors.verticalCenter: parent.verticalCenter
+                    Rectangle { 
+                        width: 5 * s; height: 5 * s; 
+                        color: root.isDarkTheme ? "#1a243d" : "white"; anchors.centerIn: parent 
+                    }
+                }
+            }
+
+            Timer {
+                interval: 1000; running: true; repeat: true
+                onTriggered: {
+                    var d = new Date()
+                    genshinTime.text = Qt.formatTime(d, "hh:mm")
+                    genshinDate.text = Qt.formatDate(d, "dddd, MMMM d").toUpperCase()
+                }
+                Component.onCompleted: triggered()
+            }
+        }
+
         // Logo at the center
         Image {
             id: centerLogo

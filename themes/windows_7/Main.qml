@@ -556,6 +556,60 @@ Rectangle {
                 onClicked: sddm.powerOff()
             }
         }
+
+        Row {
+            anchors.centerIn: parent
+            spacing: 12 * s
+
+            Text {
+                id: timeLabel
+                font.family: root.customFontName
+                font.pixelSize: 18 * s
+                font.weight: Font.DemiBold
+                color: "white"
+                style: Text.Raised
+                styleColor: "#80000000"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Item {
+                width: 2 * s
+                height: 18 * s
+                anchors.verticalCenter: parent.verticalCenter
+                Rectangle {
+                    anchors.left: parent.left
+                    width: 1 * s; height: parent.height
+                    color: "#40000000"
+                }
+                Rectangle {
+                    anchors.right: parent.right
+                    width: 1 * s; height: parent.height
+                    color: "#40ffffff"
+                }
+            }
+
+            Text {
+                id: dateLabel
+                font.family: root.customFontName
+                font.pixelSize: 14 * s
+                color: "#e0f0ff"
+                style: Text.Raised
+                styleColor: "#80000000"
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Timer {
+                interval: 1000
+                running: true
+                repeat: true
+                onTriggered: {
+                    var d = new Date();
+                    timeLabel.text = Qt.formatTime(d, "h:mm AP");
+                    dateLabel.text = Qt.formatDate(d, "dddd, MMMM d");
+                }
+                Component.onCompleted: triggered()
+            }
+        }
     } 
 
     function doLogin() {
