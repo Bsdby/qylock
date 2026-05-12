@@ -19,9 +19,8 @@ Rectangle {
 
     property bool isQuickshell: typeof sddm === "undefined" || sddm.hostName === undefined
 
-    readonly property string themeMode: "dark"
-    readonly property bool enableWindup: true
-    readonly property bool isLight: false
+    readonly property string themeMode: config.themeMode || "dark"
+    readonly property bool isLight: themeMode === "light"
 
     // Palette
     readonly property color bgColor:     "#060504"
@@ -51,22 +50,6 @@ Rectangle {
         onTriggered: { var d = new Date(); root.curH = d.getHours(); root.curM = d.getMinutes(); root.curS = d.getSeconds(); root.curMS = d.getMilliseconds() }
     }
 
-    // Windup Animation
-    property bool  isWindup:    false
-    property real  windupProg:  0.0
-    property real  boomScale:   1.0
-    property real  boomOpacity: 0.0
-    property real  jitterX: 0
-    property real  jitterY: 0
-
-    Timer { interval: 16; running: root.isWindup; repeat: true; onTriggered: { var i = root.windupProg * 18 * s; root.jitterX = (Math.random()-0.5)*i; root.jitterY = (Math.random()-0.5)*i } }
-    NumberAnimation { id: windupAnim; target: root; property: "windupProg"; from: 0; to: 1; duration: 1600; easing.type: Easing.InQuint }
-    ParallelAnimation {
-        id: boomSequence
-        NumberAnimation { target: root; property: "boomScale";   to: 35; duration: 150; easing.type: Easing.InQuad }
-        NumberAnimation { target: root; property: "boomOpacity"; to: 1;  duration: 120; easing.type: Easing.InQuad }
-    }
-
     Component.onCompleted: fadeIn.start()
     NumberAnimation { id: fadeIn; target: root; property: "uiOpacity"; to: 1; duration: 400; easing.type: Easing.OutCubic }
 
@@ -82,18 +65,16 @@ Rectangle {
 
     // Time Frac
     readonly property real s_f: curMS / 1000.0
-    readonly property real fracSec: (curS + s_f) / 60.0
+    readonly property real fracSec:  ((curS + s_f) / 60.0)
     readonly property real m_f: (curS === 59 && s_f > 0.8) ? (function(){ var p = (s_f - 0.8) * 5.0; return p * p * (3 - 2 * p) })() : 0
-    readonly property real fracMin: (curM + m_f) / 60.0
+    readonly property real fracMin:  ((curM + m_f) / 60.0)
     readonly property real h_f: (curM === 59 && curS === 59 && s_f > 0.8) ? (function(){ var p = (s_f - 0.8) * 5.0; return p * p * (3 - 2 * p) })() : 0
-    readonly property real fracHour: ((curH % 12) + h_f) / 12.0
+    readonly property real fracHour: (((curH % 12) + h_f) / 12.0)
 
     // Scene
     Item {
         id: sceneRoot
         anchors.fill: parent; opacity: root.uiOpacity
-        x: root.jitterX; y: root.jitterY
-        transform: Scale { origin.x: root.width*0.5; origin.y: root.height*0.5; xScale: root.boomScale; yScale: root.boomScale }
 
         // Film Strips
         component AmbientStrip: Item {
@@ -201,9 +182,8 @@ Rectangle {
             Text { anchors.bottom: tapeRow.top; anchors.bottomMargin: 18 * s; anchors.horizontalCenter: tapeRow.horizontalCenter; text: String(curH).padStart(2,'0') + "  :  " + String(curM).padStart(2,'0') + "  :  " + String(curS).padStart(2,'0'); font.family: mainFont.name; font.pixelSize: 28*s; font.letterSpacing: 6*s; font.weight: Font.Black; color: root.mainText }
         }
 
-        // HUD
         Item {
-            id: hudContainer; anchors.fill: parent; opacity: root.boomOpacity > 0 ? 0 : 1
+            id: hudContainer; anchors.fill: parent
             // HUD Bar
             Row {
                 anchors.right: parent.right; anchors.rightMargin: root.marginR; anchors.top: parent.top; anchors.topMargin: 50 * s; spacing: 25 * s
@@ -271,17 +251,18 @@ Rectangle {
         }
     }
 
-    Rectangle { anchors.fill: parent; color: root.mainText; opacity: root.boomOpacity; z: 9999 }
 
-    Timer { id: boomTriggerTimer; interval: 1450; onTriggered: boomSequence.start() }
-    function startLoginSequence() { if (passInput.text.length===0) return; doLogin() }
+    function startLoginSequence() {
+        if (passInput.text.length===0) return
+        doLogin()
+    }
     function doLogin() { var uname = (userHelper.currentItem&&userHelper.currentItem.uLogin)?userHelper.currentItem.uLogin:(typeof userModel!=="undefined"?userModel.lastUser:"user"); if (typeof sddm!=="undefined") sddm.login(uname, passInput.text, root.sessionIndex) }
     function capitalizeFirst(str) { if (!str) return ""; return str.charAt(0).toUpperCase()+str.slice(1) }
 
     Connections {
         target: typeof sddm !== "undefined" ? sddm : null
-        function onLoginSucceeded() { if (root.enableWindup) { root.isWindup=true; windupAnim.start(); boomTriggerTimer.start() } }
-        function onLoginFailed() { root.isWindup=false; windupAnim.stop(); boomTriggerTimer.stop(); root.windupProg=0; root.boomScale=1; root.boomOpacity=0; errText.text="ACCESS DENIED"; passInput.text=""; passInput.forceActiveFocus(); shake.start() }
+        function onLoginSucceeded() { }
+        function onLoginFailed() { errText.text="ACCESS DENIED"; passInput.text=""; passInput.forceActiveFocus(); shake.start() }
     }
 
     SequentialAnimation {

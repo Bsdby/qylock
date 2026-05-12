@@ -246,9 +246,9 @@ if [ "$SELECTED_THEME" == "clockwork" ]; then
             substep "Windup animation enabled."
         fi
     else
-        # Sync Defaults
+        # Tape variant defaults
+        substep "Applying default Tape configuration..."
         sed -i "s/^themeMode=.*/themeMode=dark/" "$THEMES_DIR/$SELECTED_THEME/theme.conf"
-        sed -i "s/^enableWindup=.*/enableWindup=true/" "$THEMES_DIR/$SELECTED_THEME/theme.conf"
     fi
 fi
 
@@ -316,6 +316,8 @@ if [ ! -d "$SYSTEM_THEMES_DIR" ]; then
 fi
 
 # Copy Theme
+substep "Removing old version if exists..."
+sudo rm -rf "$SYSTEM_THEMES_DIR/$INSTALL_NAME"
 substep "Copying theme to /usr/share/sddm/themes/$INSTALL_NAME/..."
 sudo cp -r "$THEMES_DIR/$SELECTED_THEME" "$SYSTEM_THEMES_DIR/$INSTALL_NAME"
 

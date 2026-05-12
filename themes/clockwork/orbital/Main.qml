@@ -21,7 +21,7 @@ Rectangle {
 
     // Theme Config
     readonly property string themeMode: config.themeMode || "dark"
-    readonly property bool enableWindup: config.enableWindup === "true"
+    readonly property bool enableWindup: config.enableWindup !== "false" && config.enableWindup !== false
     readonly property bool isLight: themeMode === "light"
 
     readonly property color bgColor: isLight ? "#ffffff" : "#000000"
@@ -82,6 +82,7 @@ Rectangle {
 
     ParallelAnimation {
         id: boomSequence
+        onFinished: root.doLogin()
         NumberAnimation { target: root; property: "boomScale"; to: 35.0; duration: 150; easing.type: Easing.InQuad }
         NumberAnimation { target: root; property: "boomOpacity"; to: 1.0; duration: 120; easing.type: Easing.InQuad }
     }
@@ -283,13 +284,22 @@ Rectangle {
     }
 
     Timer { id: boomTriggerTimer; interval: 1450; onTriggered: { boomSequence.start() } }
-    function startLoginSequence() { if (passInput.text.length === 0) return; doLogin() }
+    function startLoginSequence() {
+        if (passInput.text.length === 0 || isWindup) return
+        if (root.enableWindup) {
+            isWindup = true
+            windupAnim.start()
+            boomTriggerTimer.start()
+        } else {
+            doLogin()
+        }
+    }
     function doLogin() { var uname = (userHelper.currentItem && userHelper.currentItem.uLogin) ? userHelper.currentItem.uLogin : (typeof userModel !== "undefined" ? userModel.lastUser : "user"); if (typeof sddm !== "undefined") sddm.login(uname, passInput.text, root.sessionIndex) }
     function capitalizeFirst(str) { if (!str) return ""; return str.charAt(0).toUpperCase() + str.slice(1) }
     Connections {
         target: typeof sddm !== "undefined" ? sddm : null
-        function onLoginSucceeded() { if (root.enableWindup) { isWindup = true; windupAnim.start(); boomTriggerTimer.start() } }
-        function onLoginFailed() { isWindup = false; windupAnim.stop(); boomTriggerTimer.stop(); root.windupOffset = 0; root.boomScale = 1.0; root.boomOpacity = 0.0; root.sparkIntensity = 0; errText.text = "ACCESS DENIED"; passInput.text = ""; passInput.forceActiveFocus(); shake.start() }
+        function onLoginSucceeded() { }
+        function onLoginFailed() { isWindup = false; windupAnim.stop(); boomTriggerTimer.stop(); boomSequence.stop(); root.windupOffset = 0; root.boomScale = 1.0; root.boomOpacity = 0.0; root.sparkIntensity = 0; errText.text = "ACCESS DENIED"; passInput.text = ""; passInput.forceActiveFocus(); shake.start() }
     }
     SequentialAnimation {
         id: shake
