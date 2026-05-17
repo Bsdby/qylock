@@ -407,7 +407,7 @@ Huge thanks to all the amazing artists for these wallpapers and fonts! Here's wh
 <div align="center">
 
 ### 💖 SUPPORTERS
-**[Max](https://ko-fi.com/B0B1UPVVB)**  •  **Awkward (Aman)**  •  **Chương Kính**  •  **MerhawiGhebrekal**  •  **Silenett**  •  **wawzi**  •  **franchecol**  •  **MerhawiGhebrekal**  •  **Trench Martyr**
+**[Max](https://ko-fi.com/B0B1UPVVB)**  •  **Awkward**  •  **Chương Kính**  •  **MerhawiGhebrekal**  •  **Silenett**  •  **wawzi**  •  **franchecol**  •  **MerhawiGhebrekal**  •  **Trench Martyr**
 
 <br>
 
